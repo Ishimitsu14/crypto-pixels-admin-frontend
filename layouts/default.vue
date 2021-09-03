@@ -103,8 +103,8 @@ export default {
         },
         {
           icon: 'mdi-chart-bubble',
-          title: 'Gif',
-          to: '/gif'
+          title: 'Product',
+          to: '/product'
         }
       ],
       miniVariant: false,
