@@ -21,10 +21,17 @@
               label="Height of images"
             />
           </div>
+          <div class="d-flex align-center mb-5">
+            <v-checkbox
+              v-model="generateConfig.isAttributes"
+              class="mr-2"
+              label="Generate with attributes"
+            />
+          </div>
           <v-btn
             color="primary"
             class="mt-5"
-            :disabled="disabledGenerate"
+            :disabled="disableGenerateButton"
             @click="generate"
           >
             Generate
@@ -45,12 +52,13 @@ export default Vue.extend({
     generateConfig: {
       countImages: 0,
       width: 0,
-      height: 0
+      height: 0,
+      isAttributes: false
     }
   }),
   computed: {
-    disableGenerate () {
-      return this.generateConfig.countImages <= 0 && this.generateConfig.width <= 0 && this.generateConfig.height
+    disableGenerateButton () {
+      return !(this.generateConfig.countImages > 0 && this.generateConfig.width > 0 && this.generateConfig.height > 0)
     }
   },
   methods: {

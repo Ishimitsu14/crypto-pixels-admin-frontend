@@ -87,9 +87,9 @@ export default Vue.extend({
   data: () => ({
     headers: [
       { text: 'Id', value: 'id' },
-      { text: 'Uuid', value: 'uuid' },
       { text: 'Meta Data', value: 'json' },
       { text: 'Sold', value: 'is_sold' },
+      { text: 'Attributes', value: 'attributes' },
       { text: 'Created At', value: 'createdAt' },
       { text: 'Product', value: 'product', sortable: false }
     ],
