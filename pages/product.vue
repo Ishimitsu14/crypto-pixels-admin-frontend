@@ -19,7 +19,25 @@
               <template
                 #item.product="{ item }"
               >
-                <img style="width: 200px" :src="getProductSrc(item)"/>
+                <img style="width: 200px" :src="getProductSrc(item)">
+              </template>
+              <template
+                #item.attributes="{ item }"
+              >
+                <div class="d-flex flex-column attributes">
+                  <div
+                    v-for="(attribute, index) in getAttributes(item.attributes)"
+                    :key="index"
+                    class="d-flex attributes__item"
+                  >
+                    <div class="attributes__name">
+                      {{ attribute.name }}
+                    </div>
+                    <div class="attributes__value">
+                      {{ attribute.value }}
+                    </div>
+                  </div>
+                </div>
               </template>
             </v-data-table>
           </v-card-text>
@@ -123,11 +141,26 @@ export default Vue.extend({
     },
     getProductSrc (product: any) {
       return `${process.env.API_URL}/product/${product.uuid}`
+    },
+    getAttributes (attributes: string) {
+      return JSON.parse(attributes)
     }
   }
 })
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.attributes {
+  margin: 5px 0;
+  &__item {
+    background: #565656;
+    padding: 5px;
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
+  }
+  &__name, &__value {
+    width: 50%;
+  }
+}
 </style>
