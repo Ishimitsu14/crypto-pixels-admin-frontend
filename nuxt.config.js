@@ -44,13 +44,23 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    'nuxt-socket-io'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     baseURL: process.env.API_URL,
     browserBaseURL: process.env.API_URL
+  },
+
+  io: {
+    sockets: [
+      {
+        name: 'main',
+        url: process.env.SOCKET_URL
+      }
+    ]
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

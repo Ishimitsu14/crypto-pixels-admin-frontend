@@ -58,6 +58,7 @@
       </v-btn>
     </v-app-bar>
     <v-main>
+      <notification />
       <v-container>
         <Nuxt />
       </v-container>
@@ -89,7 +90,9 @@
 </template>
 
 <script>
+import Notification from '../components/Notification'
 export default {
+  components: { Notification },
   data () {
     return {
       clipped: false,
@@ -112,6 +115,6 @@ export default {
       rightDrawer: false,
       title: 'Crypto Punks'
     }
-  }
+  },
 }
 </script>

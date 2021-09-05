@@ -26,12 +26,12 @@
               >
                 <div class="d-flex flex-column attributes">
                   <div
-                    v-for="(attribute, index) in getAttributes(item.attributes)"
+                    v-for="(attribute, index) in item.attributes"
                     :key="index"
                     class="d-flex attributes__item"
                   >
                     <div class="attributes__name">
-                      {{ attribute.name }}
+                      {{ attribute.trait_type }}
                     </div>
                     <div class="attributes__value">
                       {{ attribute.value }}
@@ -139,9 +139,6 @@ export default Vue.extend({
     getProductSrc (product: any) {
       return `${process.env.API_URL}/product/${product.uuid}`
     },
-    getAttributes (attributes: string) {
-      return JSON.parse(attributes)
-    }
   }
 })
 </script>
