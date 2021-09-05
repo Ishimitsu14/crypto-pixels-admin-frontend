@@ -30,12 +30,8 @@
                     :key="index"
                     class="d-flex attributes__item"
                   >
-                    <div class="attributes__name">
-                      {{ attribute.trait_type }}
-                    </div>
-                    <div class="attributes__value">
-                      {{ attribute.value }}
-                    </div>
+                    <div class="attributes__name">{{ trimString(attribute.trait_type) }}</div>
+                    <div class="attributes__value">{{ trimString(attribute.value) }}</div>
                   </div>
                 </div>
               </template>
@@ -139,6 +135,9 @@ export default Vue.extend({
     getProductSrc (product: any) {
       return `${process.env.API_URL}/product/${product.uuid}`
     },
+    trimString (str: string) {
+      return str.trim()
+    }
   }
 })
 </script>
