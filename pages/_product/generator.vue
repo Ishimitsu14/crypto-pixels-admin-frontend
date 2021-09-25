@@ -11,17 +11,6 @@
             />
           </div>
           <div class="d-flex align-center mb-5">
-            <v-text-field
-              v-model="generateConfig.width"
-              class="mr-2"
-              label="Width of images"
-            />
-            <v-text-field
-              v-model="generateConfig.height"
-              label="Height of images"
-            />
-          </div>
-          <div class="d-flex align-center mb-5">
             <v-checkbox
               v-model="generateConfig.isAttributes"
               class="mr-2"
@@ -51,14 +40,12 @@ export default Vue.extend({
   data: () => ({
     generateConfig: {
       countImages: 0,
-      width: 0,
-      height: 0,
       isAttributes: false
     }
   }),
   computed: {
     disableGenerateButton () {
-      return !(this.generateConfig.countImages > 0 && this.generateConfig.width > 0 && this.generateConfig.height > 0)
+      return !(this.generateConfig.countImages > 0)
     }
   },
   methods: {
