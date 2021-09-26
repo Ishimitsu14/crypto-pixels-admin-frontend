@@ -13,5 +13,6 @@ export default (axios: NuxtAxiosInstance) => ({
         'Content-Type': 'multipart/form-data'
       }
     })
-  )
+  ),
+  stats: async () => await axios.$get('/product/stats')
 })

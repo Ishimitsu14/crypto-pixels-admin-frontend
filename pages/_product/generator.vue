@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import gif from '../../requests/product'
+import product from '../../requests/product'
 
 export default Vue.extend({
   name: 'Generator',
@@ -51,7 +51,7 @@ export default Vue.extend({
   methods: {
     async generate () {
       try {
-        await gif(this.$axios).generate(this.generateConfig)
+        await product(this.$axios).generate(this.generateConfig)
       } catch (e) {
         console.log(e)
       }
