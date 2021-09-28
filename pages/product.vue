@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-row>
       <v-col>
         <v-card>
@@ -14,25 +14,40 @@
           <v-card-text>
             <v-data-table
               :headers="headers"
-              :items="generatedItems"
+              :items="products"
+              :options.sync="options"
+              :server-items-length="total"
+              :footer-props="{ itemsPerPageOptions: [ 10, 30, 50, 100 ] }"
             >
               <template
                 #item.product="{ item }"
               >
-                <img style="width: 200px" :src="getProductSrc(item)">
+                <img :data-image="item.uuid" style="width: 200px">
               </template>
               <template
                 #item.attributes="{ item }"
               >
-                <div class="d-flex flex-column attributes">
-                  <div
-                    v-for="(attribute, index) in item.attributes"
-                    :key="index"
-                    class="d-flex attributes__item"
-                  >
-                    <div class="attributes__name">{{ trimString(attribute.trait_type) }}</div>
-                    <div class="attributes__value">{{ trimString(attribute.value) }}</div>
-                  </div>
+                <v-btn color="primary" @click="showAttributes(item)">
+                  Show attributes
+                </v-btn>
+              </template>
+              <template
+                #item.stats="{ item }"
+              >
+                <v-btn color="primary" @click="showStats(item)">
+                  Show stats
+                </v-btn>
+              </template>
+              <template
+                #item.actions="{ item }"
+              >
+                <div class="d-flex flex-column">
+                  <v-btn icon color="green" :to="`/product/${item.id}`">
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn icon color="red" @click="destroy(item)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
                 </div>
               </template>
             </v-data-table>
@@ -49,6 +64,7 @@
               label="Upload archive with source images"
               show-size
               class="mr-8"
+              accept=".zip"
             />
           </div>
           <div class="d-flex align-center">
@@ -82,48 +98,108 @@
         </div>
       </v-col>
     </v-row>
+    <attribute-modal
+      :is-show="isShowAttributes"
+      :product="currentProduct"
+      @close="hideAttributes"
+    />
+    <stats-modal
+      :is-show="isShowStats"
+      :product="currentProduct"
+      @close="hideStats"
+    />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { Context } from '@nuxt/types'
-import product from '~/requests/product'
+import requestProduct from '~/requests/product'
+import AttributeModal from '~/components/product/AttributeModal.vue'
+import { IProduct } from '~/types/IProduct'
+import StatsModal from '~/components/product/StatsModal.vue'
 
 export default Vue.extend({
   name: 'Product',
-  async asyncData (ctx: Context): Promise<object> {
-    const generatedItems = await product(ctx.$axios).get()
-    return {
-      generatedItems
-    }
-  },
+  components: { StatsModal, AttributeModal },
   data: () => ({
     headers: [
       { text: 'Id', value: 'id' },
+      { text: 'Uuid', value: 'uuid' },
       { text: 'Attributes', value: 'attributes' },
-      { text: 'Product', value: 'product', sortable: false }
+      { text: 'Stats', value: 'stats' },
+      { text: 'Product', value: 'product', sortable: false },
+      { text: 'Actions', value: 'actions', sortable: false }
     ],
-    generatedItems: [],
-    tiles: '',
+    products: [] as IProduct[],
+    tiles: {} as File | object,
     loaded: false,
     asyncMessage: { type: '', message: '' },
-    sizeUploadTiles: { width: 0, height: 0 }
+    sizeUploadTiles: { width: 0, height: 0 },
+    options: {
+      itemsPerPage: 10,
+      page: 1,
+      sortBy: [] as string[],
+      sortDesc: [] as number[]
+    },
+    total: 0,
+    currentProduct: {} as IProduct | object,
+    isShowAttributes: false,
+    isShowStats: false
   }),
   computed: {
     disableUploadButton () {
       return this.tiles && (this.sizeUploadTiles.width <= 0 && this.sizeUploadTiles.height <= 0)
     }
   },
+  watch: {
+    options () {
+      this.getProducts()
+    }
+  },
   methods: {
+    async destroy (item: IProduct) {
+      const response = await requestProduct(this.$axios).destroy(item.id)
+      if (response.success) {
+        await this.getProducts()
+      }
+    },
+    hideAttributes () {
+      this.currentProduct = {}
+      this.isShowAttributes = false
+    },
+    showAttributes (product: IProduct) {
+      this.currentProduct = product
+      this.isShowAttributes = true
+    },
+    hideStats () {
+      this.currentProduct = {}
+      this.isShowStats = false
+    },
+    showStats (product: IProduct) {
+      this.currentProduct = product
+      this.isShowStats = true
+    },
+    async getProducts () {
+      const params: { page: number; perPage: number, sortBy: string, sortDesc: number } = {
+        perPage: this.options.itemsPerPage,
+        page: this.options.page,
+        sortBy: this.options.sortBy[0] ? this.options.sortBy[0] : '',
+        sortDesc: this.options.sortDesc[0] ? -1 : 1
+      }
+      const { products, total } = await requestProduct(this.$axios).get(params)
+      this.total = total
+      products.forEach((product: any) => this.getProductSrc(product))
+      this.products = products
+    },
     async uploadTiles () {
       if (this.tiles) {
         const formData = new FormData()
+        // @ts-ignore
         formData.append('source_tiles', this.tiles)
         this.loaded = true
         this.asyncMessage = { type: '', message: '' }
         try {
-          const response = await product(this.$axios).uploadTiles(formData, this.sizeUploadTiles)
+          const response = await requestProduct(this.$axios).uploadTiles(formData, this.sizeUploadTiles)
           this.loaded = false
           this.asyncMessage = { type: 'success', message: response.success.message }
         } catch (e) {
@@ -132,28 +208,15 @@ export default Vue.extend({
         }
       }
     },
-    getProductSrc (product: any) {
-      return `${process.env.API_URL}/product/${product.uuid}`
-    },
-    trimString (str: string) {
-      return str.trim()
+    async getProductSrc (product: IProduct) {
+      const image = await requestProduct(this.$axios).getImageData(product.uuid)
+      const el = document.querySelector(`[data-image="${product.uuid}"]`)
+      if (el) {
+        el.setAttribute('src', image)
+      }
     }
   }
 })
 </script>
 
-<style lang="scss" scoped>
-.attributes {
-  margin: 5px 0;
-  &__item {
-    background: #565656;
-    padding: 5px;
-    &:not(:last-child) {
-      margin-bottom: 10px;
-    }
-  }
-  &__name, &__value {
-    width: 50%;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

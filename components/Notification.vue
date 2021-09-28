@@ -21,12 +21,17 @@ export default Vue.extend({
   data: () => ({
     notifications: []
   }),
-  mounted () {
-    this.$nuxtSocket({ channel: '/' }).on('notification', (msg) => {
-      this.notifications = JSON.parse(msg).map(item => ({ ...item, isShow: true }))
-      const audio = new Audio('/sounds/notify.mp3')
-      audio.play()
-    })
+  created () {
+    this.setNotifications()
+  },
+  methods: {
+    setNotifications () {
+      this.$nuxtSocket({ channel: '/', reconnection: true }).on('notification', (msg) => {
+        this.notifications = JSON.parse(msg).map(item => ({ ...item, isShow: true }))
+        const audio = new Audio('/sounds/notify.mp3')
+        audio.play()
+      })
+    }
   }
 })
 </script>
