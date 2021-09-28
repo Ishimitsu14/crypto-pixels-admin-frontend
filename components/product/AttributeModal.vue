@@ -32,8 +32,9 @@
                       <template #activator="{ on }">
                         <v-btn
                           :key="`value-${index}`"
+                          v-clipboard:copy="attribute.trait_type"
                           icon
-                          @click="copy($event, on, attribute.trait_type)"
+                          @click="onCopy($event, on)"
                         >
                           <v-icon small>
                             mdi-content-copy
@@ -54,8 +55,9 @@
                       <template #activator="{ on }">
                         <v-btn
                           :key="`value-${index}`"
+                          v-clipboard:copy="attribute.value"
                           icon
-                          @click="copy($event, on, attribute.value)"
+                          @click="onCopy($event, on)"
                         >
                           <v-icon small>
                             mdi-content-copy
@@ -66,6 +68,7 @@
                     </v-tooltip>
                   </div>
                 </div>
+                <input ref="copied-value" v-model="copied">
               </div>
             </v-col>
           </v-row>
@@ -91,10 +94,11 @@ export default Vue.extend({
       required: true
     }
   },
+  data: () => ({
+    copied: ''
+  }),
   methods: {
-    async copy ($event: any, tooltip: any, text: string): Promise<void> {
-      const cb = navigator.clipboard
-      await cb.writeText(text)
+    onCopy ($event: any, tooltip: any): void {
       tooltip.click($event)
       setTimeout(() => tooltip.click($event), 1000)
     }

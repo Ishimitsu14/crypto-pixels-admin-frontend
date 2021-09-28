@@ -29,7 +29,8 @@
                     <template #activator="{ on }">
                       <v-btn
                         icon
-                        @click="copy($event, on, `${stat.name}: ${stat.value}`)"
+                        v-clipboard:copy="`${stat.name}: ${stat.value}`"
+                        @click="onCopy($event, on)"
                       >
                         <v-icon small>
                           mdi-content-copy
@@ -65,9 +66,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    async copy ($event: any, tooltip: any, text: string): Promise<void> {
-      const cb = navigator.clipboard
-      await cb.writeText(text)
+    onCopy ($event: any, tooltip: any): void {
       tooltip.click($event)
       setTimeout(() => tooltip.click($event), 1000)
     }
