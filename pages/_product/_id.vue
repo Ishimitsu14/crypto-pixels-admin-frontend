@@ -72,17 +72,22 @@
                       Image
                     </h3>
                     <img class="poster mb-6" :src="src" :alt="`Unicorn #${product.id}`" />
-                    <v-file-input
-                      v-model="uploadImage"
-                      label="Upload image for change"
-                      show-size
-                      class="mr-8"
-                      style="width: 100%"
-                      accept="image/png"
-                    />
-                    <v-btn @click="upload">
-                      Upload and change
-                    </v-btn>
+                    <div
+                      v-if="product.status === statuses.NOT_UPLOADED.value"
+                      class="d-flex flex-column"
+                    >
+                      <v-file-input
+                        v-model="uploadImage"
+                        label="Upload image for change"
+                        show-size
+                        class="mr-8"
+                        style="width: 100%"
+                        accept="image/png"
+                      />
+                      <v-btn @click="upload">
+                        Upload and change
+                      </v-btn>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -104,7 +109,8 @@ export default Vue.extend({
   data: () => ({
     product: {} as IProduct,
     src: '',
-    uploadImage: {} as File | object
+    uploadImage: {} as File | object,
+    statuses
   }),
   computed: {
     status () {

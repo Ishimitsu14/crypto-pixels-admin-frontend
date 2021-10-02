@@ -39,13 +39,25 @@
                 </v-btn>
               </template>
               <template
+                #item.status="{ item }"
+              >
+                <v-alert :color="getStatusColor(item.status)" class="text-no-wrap mb-0" style="padding: 5px 10px">
+                  {{ getStatusName(item.status) }}
+                </v-alert>
+              </template>
+              <template
                 #item.actions="{ item }"
               >
                 <div class="d-flex flex-column">
                   <v-btn icon color="green" :to="`/product/${item.id}`">
-                    <v-icon>mdi-pencil</v-icon>
+                    <v-icon>mdi-eye</v-icon>
                   </v-btn>
-                  <v-btn icon color="red" @click="destroy(item)">
+                  <v-btn
+                    v-if="item.status === statuses.NOT_UPLOADED.value"
+                    icon
+                    color="red"
+                    @click="destroy(item)"
+                  >
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
                 </div>
@@ -117,6 +129,7 @@ import requestProduct from '~/requests/product'
 import AttributeModal from '~/components/product/AttributeModal.vue'
 import { IProduct } from '~/types/IProduct'
 import StatsModal from '~/components/product/StatsModal.vue'
+import { statuses } from '~/constants/statuses'
 
 export default Vue.extend({
   name: 'Product',
@@ -127,6 +140,7 @@ export default Vue.extend({
       { text: 'Uuid', value: 'uuid' },
       { text: 'Attributes', value: 'attributes' },
       { text: 'Stats', value: 'stats' },
+      { test: 'Status', value: 'status' },
       { text: 'Product', value: 'product', sortable: false },
       { text: 'Actions', value: 'actions', sortable: false }
     ],
@@ -144,7 +158,8 @@ export default Vue.extend({
     total: 0,
     currentProduct: {} as IProduct | object,
     isShowAttributes: false,
-    isShowStats: false
+    isShowStats: false,
+    statuses
   }),
   computed: {
     disableUploadButton () {
@@ -214,6 +229,44 @@ export default Vue.extend({
       if (el) {
         el.setAttribute('src', image)
       }
+    },
+    getStatusName (statusNumber: number) {
+      let status = ''
+      Object.keys(statuses).forEach((i: string) => {
+        if (statuses[i].value === statusNumber) {
+          status = statuses[i]?.text
+        }
+      })
+      return status
+    },
+    getStatusColor (statusNumber: number) {
+      let color = ''
+      let status: { text: string, value: number } = { text: '', value: 0 }
+      Object.keys(statuses).forEach((i: string) => {
+        if (statuses[i].value === statusNumber) {
+          status = statuses[i]
+        }
+      })
+      if (status && status.value) {
+        switch (status.value) {
+          case statuses.NOT_UPLOADED.value:
+            color = 'gray'
+            break
+          case statuses.UPLOADED_TO_IPFS.value:
+            color = 'primary'
+            break
+          case statuses.PENDING_SELL.value:
+            color = 'warning'
+            break
+          case statuses.GIVE_AWAY.value:
+            color = 'info'
+            break
+          case statuses.SOLD.value:
+            color = 'success'
+            break
+        }
+      }
+      return color
     }
   }
 })
