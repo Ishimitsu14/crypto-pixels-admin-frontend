@@ -5,7 +5,7 @@
         <v-card>
           <v-card-title style="width: 100%">
             <div class="d-flex justify-space-between" style="width: 100%">
-              Gifs
+              Products
               <router-link to="/product/generator">
                 Generator
               </router-link>

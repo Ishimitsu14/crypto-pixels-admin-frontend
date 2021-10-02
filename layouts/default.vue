@@ -89,7 +89,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Crypto Punks'
+      title: 'Unicorn Multiverse'
     }
   }
 }
