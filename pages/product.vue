@@ -140,7 +140,7 @@ export default Vue.extend({
       { text: 'Uuid', value: 'uuid' },
       { text: 'Attributes', value: 'attributes' },
       { text: 'Stats', value: 'stats' },
-      { test: 'Status', value: 'status' },
+      { text: 'Status', value: 'status' },
       { text: 'Product', value: 'product', sortable: false },
       { text: 'Actions', value: 'actions', sortable: false }
     ],
